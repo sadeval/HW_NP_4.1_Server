@@ -12,17 +12,31 @@ namespace TicTacToeServer
 
         static void Main()
         {
-            server = new TcpListener(IPAddress.Any, 5500);
-            server.Start();
-            Console.WriteLine("Сервер запущен...");
-
-            while (true)
+            try
             {
-                var client1 = server.AcceptTcpClient();
-                var client2 = server.AcceptTcpClient();
-                Game game = new Game(client1, client2);
-                Thread gameThread = new Thread(game.Start);
-                gameThread.Start();
+                server = new TcpListener(IPAddress.Any, 5500);
+                server.Start();
+                Console.WriteLine("Сервер запущен... Ждем подключения..");
+
+                while (true)
+                {
+                    Console.WriteLine("Ожидаем подключения клиента 1...");
+                    var client1 = server.AcceptTcpClient();
+                    Console.WriteLine($"Клиент 1 подключен: {((IPEndPoint)client1.Client.RemoteEndPoint).Address}");
+
+                    Console.WriteLine("Ожидаем подключения клиента 2...");
+                    var client2 = server.AcceptTcpClient();
+                    Console.WriteLine($"Клиент 2 подключен: {((IPEndPoint)client2.Client.RemoteEndPoint).Address}");
+
+                    // Запуск игры в отдельном потоке
+                    Game game = new Game(client1, client2);
+                    Thread gameThread = new Thread(game.Start);
+                    gameThread.Start();
+                }
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Ошибка сервера: {ex.Message}");
             }
         }
     }
@@ -187,5 +201,7 @@ namespace TicTacToeServer
             stream1.Write(resultData1, 0, resultData1.Length);
             stream2.Write(resultData1, 0, resultData1.Length);
         }
+
+
     }
 }
