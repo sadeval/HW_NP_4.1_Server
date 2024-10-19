@@ -28,7 +28,6 @@ namespace TicTacToeServer
                     var client2 = server.AcceptTcpClient();
                     Console.WriteLine($"Клиент 2 подключен: {((IPEndPoint)client2.Client.RemoteEndPoint).Address}");
 
-                    // Запуск игры в отдельном потоке
                     Game game = new Game(client1, client2);
                     Thread gameThread = new Thread(game.Start);
                     gameThread.Start();
